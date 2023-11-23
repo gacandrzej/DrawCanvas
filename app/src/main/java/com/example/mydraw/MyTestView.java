@@ -28,14 +28,11 @@ public class MyTestView extends View {
     private Paint shadowPaint = null;
     private Paint linearGradientPaint = null;
     private Paint radialGradientPaint = null;
-    private RectF shadowBounds;
-    private int heightPixels;
-    private int widthPixels;
-    private Path path;
     private Path polygonPath;
     private ArrayList<Point> points = null;
     private int width;
     private int height;
+    private final String TAG = "1111";
 
     public MyTestView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -51,13 +48,12 @@ public class MyTestView extends View {
         for(Point p: points){
             canvas.drawPoint(p.x,p.y,bluePaint);
         }
-        Log.v("1111",height + " "+ width);
-        Log.v("1111",getHeight() + " "+ getWidth());
+        Log.v(TAG,height + " "+ width);
+        Log.v(TAG,getHeight() + " "+ getWidth());
         // canvas.drawCircle(width/2, height/2,100,bluePaint);
         canvas.drawLine(20,30,width-20,30,greenPaint);
         canvas.drawText("Simple application 2023!!!",20,height-50,redPaint);
-        //  canvas.drawTextOnPath("Mistrzostwa Świata w piłce nożnej 2022",
-        //         path,0,0,redPaint);
+        //  canvas.drawTextOnPath("Mistrzostwa Świata w piłce nożnej 2022", path,0,0,redPaint);
         canvas.drawRect(45,45,width-195,135,redPaint);
 
         canvas.drawRect(50,50,width-200,130,yellowPaint);
@@ -66,7 +62,7 @@ public class MyTestView extends View {
 
         canvas.drawCircle(getWidth()/2.0f,getHeight()/2.0f,getWidth()/3.0f,radialGradientPaint);
 
-        shadowBounds = new RectF(50,0.75f*getHeight(),getWidth()-50,getHeight()-150);
+        RectF shadowBounds = new RectF(50, 0.75f * getHeight(), getWidth() - 50, getHeight() - 150);
         canvas.drawOval(shadowBounds,shadowPaint);
         //
         canvas.drawPath(polygonPath,bluePaint);
@@ -91,9 +87,10 @@ public class MyTestView extends View {
     private void init(){
 
         points = new ArrayList<>();
-           heightPixels = getResources().getDisplayMetrics().heightPixels;
-           widthPixels = getResources().getDisplayMetrics().widthPixels;
-        path = new Path();
+        int heightPixels = getResources().getDisplayMetrics().heightPixels;
+        int widthPixels = getResources().getDisplayMetrics().widthPixels;
+           Log.v(TAG, "heightPixels="+ heightPixels +" widthPixels="+ widthPixels +" ");
+        Path path = new Path();
         path.addCircle(400,700,200, Path.Direction.CW);
         //
         polygonPath = new Path();
