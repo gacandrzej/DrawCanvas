@@ -13,17 +13,12 @@ import android.graphics.RadialGradient;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.Typeface;
-import android.graphics.fonts.Font;
-import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-
 import androidx.annotation.Nullable;
-
 import java.util.ArrayList;
-
 
 public class MyTestView extends View {
     private Paint bluePaint = null;
@@ -33,13 +28,12 @@ public class MyTestView extends View {
     private Paint shadowPaint = null;
     private Paint linearGradientPaint = null;
     private Paint radialGradientPaint = null;
-    //
     private RectF shadowBounds;
     private int heightPixels;
     private int widthPixels;
     private Path path;
     private Path polygonPath;
-    ArrayList<Point> points = null;
+    private ArrayList<Point> points = null;
     private int width;
     private int height;
 
@@ -47,16 +41,12 @@ public class MyTestView extends View {
         super(context, attrs);
         init();
     }
-
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         initShader();
         myDraw(canvas);
     }
-
-
-
     private void myDraw(Canvas canvas){
         for(Point p: points){
             canvas.drawPoint(p.x,p.y,bluePaint);
@@ -74,7 +64,7 @@ public class MyTestView extends View {
         // linear gradient
         canvas.drawRect(50,250,1000,400,linearGradientPaint);
 
-        canvas.drawCircle(getWidth()/2,getHeight()/2,getWidth()/3,radialGradientPaint);
+        canvas.drawCircle(getWidth()/2.0f,getHeight()/2.0f,getWidth()/3.0f,radialGradientPaint);
 
         shadowBounds = new RectF(50,0.75f*getHeight(),getWidth()-50,getHeight()-150);
         canvas.drawOval(shadowBounds,shadowPaint);
@@ -88,9 +78,9 @@ public class MyTestView extends View {
                 Shader.TileMode.MIRROR
         ));
         radialGradientPaint.setShader( new RadialGradient(
-                getWidth()/2,
-                getHeight()/2,
-                getWidth()/3,
+                getWidth()/2.0f,
+                getHeight()/2.0f,
+                getWidth()/3.0f,
                 Color.RED,
                 Color.YELLOW,
                 Shader.TileMode.MIRROR
@@ -100,10 +90,9 @@ public class MyTestView extends View {
 
     private void init(){
 
-        points = new ArrayList<Point>();
-
-        //  heightPixels = getResources().getDisplayMetrics().heightPixels;
-        //   widthPixels = getResources().getDisplayMetrics().widthPixels;
+        points = new ArrayList<>();
+           heightPixels = getResources().getDisplayMetrics().heightPixels;
+           widthPixels = getResources().getDisplayMetrics().widthPixels;
         path = new Path();
         path.addCircle(400,700,200, Path.Direction.CW);
         //
@@ -122,18 +111,15 @@ public class MyTestView extends View {
         Typeface tf =getResources().getFont(R.font.rage);
         // blue
         bluePaint = new Paint();
-        bluePaint.setColor(Color.BLUE);
+        //bluePaint.setColor(Color.BLUE);
+        bluePaint.setColor(getResources().getColor(R.color.blue,null));
         bluePaint.setTextSize(125);
         bluePaint.setStrokeWidth(30);
         bluePaint.setTypeface(tf);
         bluePaint.setStyle(Paint.Style.FILL_AND_STROKE);
         // red
         redPaint = new Paint();
-        redPaint.setColor(   getResources().getColor(
-                        R.color.red,
-                        null
-                )
-        );
+        redPaint.setColor(   getResources().getColor( R.color.red, null) );
         redPaint.setTextSize(85);
         redPaint.setTypeface(tf);
         // green
@@ -142,7 +128,6 @@ public class MyTestView extends View {
         greenPaint.setColor(getResources().getColor(R.color.green,null));
         greenPaint.setTextSize(125);
         greenPaint.setTypeface(tf);
-
         // yellow
         yellowPaint = new Paint();
         yellowPaint.setStrokeWidth(10);
@@ -157,13 +142,11 @@ public class MyTestView extends View {
         linearGradientPaint = new Paint();
         //  linearGradientPaint.setColor(getResources().getColor(R.color.red,null));
         linearGradientPaint.setStrokeWidth(2);
-
         // radial
         radialGradientPaint = new Paint();
         radialGradientPaint.setColor(Color.BLACK);
         radialGradientPaint.setStrokeWidth(1);
         radialGradientPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-
     }
 
     @Override
