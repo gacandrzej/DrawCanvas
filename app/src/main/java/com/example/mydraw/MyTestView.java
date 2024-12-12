@@ -2,6 +2,8 @@ package com.example.mydraw;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -9,16 +11,21 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.RadialGradient;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import androidx.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MyTestView extends View {
     private Paint bluePaint = null;
@@ -29,18 +36,21 @@ public class MyTestView extends View {
     private Paint linearGradientPaint = null;
     private Paint radialGradientPaint = null;
     private Path polygonPath;
-    private ArrayList<Point> points = null;
+    private List<Point> points = null;
     private int width;
     private int height;
     private final String TAG = "1111";
+    private Path path;
+    private Bitmap appleBitmap;
 
     public MyTestView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        init();
+        points = new ArrayList<>();
     }
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        init();
         initShader();
         myDraw(canvas);
     }
@@ -51,22 +61,198 @@ public class MyTestView extends View {
         Log.v(TAG,height + " "+ width);
         Log.v(TAG,getHeight() + " "+ getWidth());
         // canvas.drawCircle(width/2, height/2,100,bluePaint);
-        canvas.drawLine(20,30,width-20,30,greenPaint);
-        canvas.drawText("Simple application 2023!!!",20,height-50,redPaint);
-        //  canvas.drawTextOnPath("Mistrzostwa Świata w piłce nożnej 2022", path,0,0,redPaint);
-        canvas.drawRect(45,45,width-195,135,redPaint);
+        //canvas.drawLine(20,30,width-20,30,greenPaint);
+       // canvas.drawText("Simple application 2023!!!",20,height-50,redPaint);
+       // canvas.drawTextOnPath("Mistrzostwa Świata w piłce nożnej 2022", path,0,0,redPaint);
+      //  canvas.drawRect(45,45,width-195,135,redPaint);
 
-        canvas.drawRect(50,50,width-200,130,yellowPaint);
+      //  canvas.drawRect(50,50,width-200,130,yellowPaint);
         // linear gradient
-        canvas.drawRect(50,250,1000,400,linearGradientPaint);
+      //  canvas.drawRect(50,250,1000,400,linearGradientPaint);
 
-        canvas.drawCircle(getWidth()/2.0f,getHeight()/2.0f,getWidth()/3.0f,radialGradientPaint);
+      //  canvas.drawCircle(getWidth()/2.0f,getHeight()/2.0f,getWidth()/3.0f,radialGradientPaint);
 
-        RectF shadowBounds = new RectF(50, 0.75f * getHeight(), getWidth() - 50, getHeight() - 150);
-        canvas.drawOval(shadowBounds,shadowPaint);
+      //  RectF shadowBounds = new RectF(50, 0.75f * getHeight(), getWidth() - 50, getHeight() - 150);
+      //  canvas.drawOval(shadowBounds,shadowPaint);
         //
-        canvas.drawPath(polygonPath,bluePaint);
+      //  canvas.drawPath(polygonPath,bluePaint);
+
+       // drawHexagon(canvas);
+
+      //  drawSinus(canvas);
+        // Załaduj bitmapę z zasobów (załóżmy, że apple.png jest w folderze drawable)
+
+        myDrawBitmap(canvas);
+
+
+        // basicMethods(canvas);
+
+        //myDrawARGB(canvas);
+
+        //myDrawRectForLoop(canvas);
+
+
+        //  myClipOutRect(canvas);
+
+
+        // float[] myPoints = {100, 120, 170, 130, 140, 100, 60, 70, 30, 80};
+
+        //drawMyLines(canvas);
+
+
+        // drawRoundRectMy(canvas);
+
+        //  drawTriangle(canvas);
+
+
     }
+
+    private void myDrawBitmap(Canvas canvas) {
+        appleBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.apple);
+
+        // Ustaw gęstość na wartość odpowiadającą gęstości ekranu urządzenia
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        canvas.setDensity(metrics.densityDpi);
+
+        canvas.drawBitmap(appleBitmap, 0, 0, null);
+    }
+
+    private void basicMethods(Canvas canvas) {
+        bluePaint.setStrokeWidth(5);
+        canvas.drawLine(10,400,getWidth()-10,200,bluePaint);
+
+        canvas.drawRect(1000,300,200,600,redPaint);
+
+        RectF rectF = new RectF(1000,300,200,600);
+        canvas.drawRect(rectF,yellowPaint);
+
+
+        canvas.drawARGB(128, 0, 255, 0);
+
+
+        canvas.drawRect(getWidth() / 2, 0, getWidth(), getHeight() / 4, yellowPaint);
+    }
+
+    private void myDrawARGB(Canvas canvas) {
+        Path path = new Path();
+        path.addCircle(getWidth() / 2, getHeight() / 2, 200, Path.Direction.CW);
+        canvas.drawARGB(255, 0, 0, 255);
+        canvas.drawPath(path, greenPaint);
+    }
+
+    private void myDrawRectForLoop(Canvas canvas) {
+        Paint paint = new Paint();
+        for (int i = 0; i < 255; i++) {
+            paint.setColor(Color.argb(255, 255-i, i, 255 - i));
+            canvas.drawRect(0, i, getWidth(), i + 1, paint);
+        }
+    }
+
+    private static void myClipOutRect(Canvas canvas) {
+        Paint paint = new Paint();
+
+
+        paint.setColor(Color.RED);
+        canvas.drawRect(100, 100, 300, 200, paint);
+
+        RectF clipRect = new RectF(150, 125, 250, 175);
+        canvas.clipOutRect(clipRect);
+
+        paint.setColor(Color.BLUE);
+        canvas.drawRect(100, 100, 300, 200, paint);
+    }
+
+    private void drawMyLines(Canvas canvas) {
+        float[] myPoints = {100, 200, 170, 130,170,130,500,700,500,700,700,200};
+        bluePaint.setStrokeWidth(5);
+        canvas.drawLines(myPoints,bluePaint);
+    }
+
+    private void drawRoundRectMy(Canvas canvas) {
+        RectF outerRect = new RectF(100, 100, 300, 200);
+        RectF innerRect = new RectF(120, 120, 280, 180);
+        float outerRadius = 20;
+        float innerRadius = 10;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            canvas.drawDoubleRoundRect(outerRect, outerRadius, outerRadius,
+                                       innerRect, innerRadius, innerRadius, bluePaint);
+        }
+    }
+
+    private void drawTriangle(Canvas canvas) {
+        float[] points = { 50, 50,
+                175,475 ,
+                525,35
+        };
+        int[] colors = {Color.RED,Color.RED,Color.RED};
+        setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        canvas.drawVertices(Canvas.VertexMode.TRIANGLES, points.length,
+                points, 0, null, 0, colors,
+                0, null, 0, 0, redPaint);
+    }
+
+    private void drawSinus(Canvas canvas) {
+        // Grubszy pędzel
+        Paint p = new Paint();
+        p.setStrokeWidth(5f); // Dostosuj grubość linii
+        // Współczynniki funkcji sinus
+        int amplitude = 150;  // amplituda (wysokość fali)
+        int frequency = 5;   // częstotliwość (ilość fal na jednostkę długości)
+        int phaseShift = 0;  // przesunięcie fazowe, Przesuwa falę w lewo lub w prawo wzdłuż osi X.
+        int verticalShift = getHeight()/2; // przesunięcie pionowe (położenie środka fali),
+        // Ustala, na jakiej wysokości na osi Y będzie oscylować fala sinusoidalna.
+
+        // Rysowanie sinusoidy
+        float startX = 10;
+        float endX = getWidth()-10;
+        p.setColor(Color.RED);
+        for (float x = startX; x <= endX; x += 0.1) {
+            float y =(float) (amplitude * Math.sin(frequency * (x + phaseShift) * 2 * Math.PI / getWidth())
+                    + verticalShift);
+            canvas.drawPoint( x, y, p);
+        }
+        // Rysowanie osi
+        p.setColor(Color.BLACK);
+       // p.setStyle(Paint.Style.STROKE);
+        float startY = getHeight() / 2;
+        // Oś x
+        canvas.drawLine(startX, getHeight() / 2, getWidth()-10, getHeight() / 2, p);
+        // Oś y
+        canvas.drawLine(getWidth()/2, 0, getWidth()/2, getHeight(), p);
+
+        // Podziałka na osi x co pi/2
+        float step = (float) (Math.PI / 2);
+        for (float x = startX; x <= endX; x += step) {
+            //canvas.drawLine(x, startY - 10, x, startY + 10, p);
+           // canvas.drawText(String.valueOf((int)(x / Math.PI) + "π/2"), x, startY + 20, p);
+        }
+    }
+
+    private void drawHexagon(Canvas canvas) {
+        // Środek sześciokąta
+        int x = getWidth()/2;
+        int y = getHeight()/2;
+        int radius = 200; // Promień okręgu opisującego sześciokąt
+        int[] xPoints = new int[6];
+        int[] yPoints = new int[6];
+        // Obliczanie wierzchołków sześciokąta
+        for (int i = 0; i < 6; i++) {
+            double angle = Math.PI / 3 * i;
+            xPoints[i] = (int) (x + radius * Math.cos(angle));
+            yPoints[i] = (int) (y + radius * Math.sin(angle));
+        }
+        Path hexagonPath = new Path();
+
+        hexagonPath.moveTo(xPoints[0], yPoints[0]);
+        for (int i = 1; i < xPoints.length; i++) {
+            hexagonPath.lineTo(xPoints[i], yPoints[i]);
+        }
+        hexagonPath.close();
+
+        canvas.drawPath(hexagonPath,greenPaint);
+    }
+
     private void initShader() {
         linearGradientPaint.setShader(new LinearGradient(50,250,1000,400,
                 Color.BLUE,
@@ -86,24 +272,27 @@ public class MyTestView extends View {
 
     private void init(){
 
-        points = new ArrayList<>();
+
         int heightPixels = getResources().getDisplayMetrics().heightPixels;
         int widthPixels = getResources().getDisplayMetrics().widthPixels;
            Log.v(TAG, "heightPixels="+ heightPixels +" widthPixels="+ widthPixels +" ");
-        Path path = new Path();
+        path = new Path();
         path.addCircle(400,700,200, Path.Direction.CW);
+
+        // Współrzędne punktów gwiazdy
+        int[] xPoints = {100, 120, 170, 130, 140, 100, 60, 70, 30, 80};
+        int[] yPoints = {30, 80, 80, 110, 160, 130, 160, 110, 80, 80};
         //
         polygonPath = new Path();
-        polygonPath.moveTo(100, 0);
-        polygonPath.lineTo(141, 71);
-        polygonPath.lineTo(217, 78);
-        polygonPath.lineTo(154, 125);
-        polygonPath.lineTo(166, 201);
-        polygonPath.lineTo(100, 170);
-        polygonPath.lineTo(34, 201);
-        polygonPath.lineTo(46, 125);
-        polygonPath.lineTo(0, 78);
-        polygonPath.lineTo(76, 71);
+        // Start at the first point
+        polygonPath.moveTo(xPoints[0], yPoints[0]);
+
+// Iterate over the remaining points, connecting them with lines
+        for (int i = 1; i < xPoints.length; i++) {
+            polygonPath.lineTo(xPoints[i], yPoints[i]);
+        }
+
+// Close the path to form a polygon
         polygonPath.close();
         Typeface tf =getResources().getFont(R.font.rage);
         // blue
