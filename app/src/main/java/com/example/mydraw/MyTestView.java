@@ -370,11 +370,11 @@ public class MyTestView extends View {
 
 
     private void init(){
-
-
         int heightPixels = getResources().getDisplayMetrics().heightPixels;
         int widthPixels = getResources().getDisplayMetrics().widthPixels;
-           Log.v(TAG, "heightPixels="+ heightPixels +" widthPixels="+ widthPixels +" ");
+        Log.v(TAG, "init(): heightPixels="+ heightPixels +" widthPixels="+ widthPixels +" ");
+        Log.v(TAG, "init(): getWith="+ getWidth() +" getHeight="+ getHeight() +" ");
+        Log.d(TAG, "init(): width="+width+" height="+height);
         path = new Path();
         path.addCircle(400,700,200, Path.Direction.CW);
 
