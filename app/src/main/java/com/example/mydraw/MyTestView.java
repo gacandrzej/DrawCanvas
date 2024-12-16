@@ -11,8 +11,6 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.RadialGradient;
 import android.graphics.RectF;
 import android.graphics.Shader;
@@ -23,16 +21,39 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+
+import androidx.annotation.ColorInt;
+import androidx.annotation.Dimension;
 import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class MyTestView extends View {
+    private List<Item> data;  // A list of items that are displayed.
+    private float pointerRadius=100;                      // Obtained from styled attributes.
+    private float pointerX=500;                           // Calculated in onSizeChanged.
+    private float pointerY=200;                           // Calculated in onSizeChanged.
+    private float textX=40;                              // Calculated in onSizeChanged.
+    private float textY;                              // Calculated in onSizeChanged.
+    private RectF bounds;                             // Calculated in onSizeChanged.
+    private RectF shadowBounds;                       // Calculated in onSizeChanged.
+    private Boolean showText=true;    // Obtained from styled attributes.
+    private int textWidth=148;       // Obtained from styled attributes.
+
+    private Paint textPaint;
+    private Paint piePaint;
+    private Paint shadowPaint;
+    @ColorInt
+    private int textColor;       // Obtained from style attributes.
+
+    @Dimension
+    private float textHeight=33;    // Obtained from style attributes.
+    private int currentItem = 0;
     private Paint bluePaint = null;
     private Paint redPaint = null;
     private Paint greenPaint = null;
     private Paint yellowPaint = null;
-    private Paint shadowPaint = null;
     private Paint linearGradientPaint = null;
     private Paint radialGradientPaint = null;
     private Path polygonPath;
@@ -46,11 +67,13 @@ public class MyTestView extends View {
     public MyTestView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         points = new ArrayList<>();
+        data = new ArrayList<Item>();
     }
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         init();
+        initDoc();
         initShader();
         myDraw(canvas);
     }
@@ -82,9 +105,9 @@ public class MyTestView extends View {
       //  drawSinus(canvas);
         // Załaduj bitmapę z zasobów (załóżmy, że apple.png jest w folderze drawable)
 
-        myDrawBitmap(canvas);
+       // myDrawBitmap(canvas);
 
-
+        drawDoc(canvas);
         // basicMethods(canvas);
 
         //myDrawARGB(canvas);
@@ -106,7 +129,83 @@ public class MyTestView extends View {
 
 
     }
+    private void initDoc() {
 
+        bounds = new RectF(30,50,300,300);
+
+        shadowBounds = new RectF(30,600,500,400);
+
+        Item item = new Item();
+        item.label="opcja 1";
+        item.startAngle=60;
+        item.endAngle=270;
+        item.color=1;
+        item.value=33;
+        // item.shader=shadowPaint.getShader();
+        Item item2 = new Item();
+        item2.label="opcja 2";
+        item2.startAngle=0;
+        item2.endAngle=45;
+        item2.color=Color.GREEN;
+        item2.value=33;
+        // item2.shader=shadowPaint.getShader();
+
+        data.add(item);
+        data.add(item2);
+
+
+        textWidth=148;
+        textColor=Color.RED;
+        showText=true;
+        textX= 40.0F;
+        textY=50.0f;
+        textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        textPaint.setColor(textColor);
+        if (textHeight == 0) {
+            textHeight = textPaint.getTextSize();
+        } else {
+            textPaint.setTextSize(textHeight);
+        }
+
+        piePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        piePaint.setStyle(Paint.Style.FILL);
+        piePaint.setTextSize(textHeight);
+        piePaint.setColor(Color.GREEN);
+
+        shadowPaint = new Paint(0);
+        shadowPaint.setColor(0xff101010);
+        shadowPaint.setMaskFilter(new BlurMaskFilter(8, BlurMaskFilter.Blur.NORMAL));
+    }
+    private void drawDoc(Canvas canvas) {
+        // Draw the shadow.
+        canvas.drawOval(
+                shadowBounds,
+                shadowPaint
+        );
+
+        // Draw the label text.
+        canvas.drawText(data.get(currentItem).label, textX, textY, textPaint);
+
+        // Draw the pie slices.
+        for (int i = 0; i < data.size(); ++i) {
+            Item it = data.get(i);
+            piePaint.setShader(it.shader);
+            canvas.drawArc(
+                    bounds,
+                    360 - it.endAngle,
+                    it.endAngle - it.startAngle,
+                    true,
+                    piePaint
+            );
+        }
+
+        // Draw the pointer.
+        // canvas.drawLine(textX, pointerY, pointerX, pointerY, textPaint);
+
+        //  canvas.drawCircle(pointerX, pointerY, pointerRadius, textPaint);
+
+        canvas.drawCircle(500, 200, 100, redPaint);
+    }
     private void myDrawBitmap(Canvas canvas) {
         appleBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.apple);
 
@@ -349,4 +448,36 @@ public class MyTestView extends View {
         invalidate();
         return true;
     }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        // Account for padding.
+        float xpad = (float)(getPaddingLeft() + getPaddingRight());
+        float ypad = (float)(getPaddingTop() + getPaddingBottom());
+        xpad=5;
+        ypad=5;
+        // Account for the label.
+        if (showText) xpad += textWidth;
+
+        float ww = (float)w - xpad;
+        float hh = (float)h - ypad;
+
+        // Figure out how big you can make the pie.
+        float diameter = Math.min(ww, hh);
+    }
+
+    // Maintains the state for a data item.
+    private class Item {
+        public String label;
+        public float value;
+        @ColorInt
+        public int color;
+
+        // Computed values.
+        public int startAngle;
+        public int endAngle;
+        public Shader shader;
+    }
+
 }
